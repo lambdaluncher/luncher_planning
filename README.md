@@ -23,11 +23,12 @@
 - [ ] STRETCH: donate button that links to a form for them to make donations
 
 **ADMIN RESOURCES**
-- [ ] username
-- [ ] password
+- [ ] username (username)
+- [ ] password (password)
 
 **SCHOOL RESOURCES**
-- [ ] school name
-- [ ] address
-- [ ] amount of funds requested
+- [ ] school name (schoolName)
+- [ ] address (schoolAddress)
+- [ ] amount of funds requested (fundsRequested)
+- [ ] amount of funds received (fundsReceived)
 
