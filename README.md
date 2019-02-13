@@ -22,13 +22,17 @@
 - [ ] contains list schools who have requested financial needs, laid out in grid format, with name, address/location, and requested amount of funds that school needs in order to provide lunches
 - [ ] STRETCH: donate button that links to a form for them to make donations
 
-**ADMIN RESOURCES**
-- [ ] username (username)
-- [ ] password (password)
+**ADMIN/DONOR RESOURCES**
+- [ ] username (username) [string]
+- [ ] password (password) [string]
+- [ ] first name (firstName) [string]
+- [ ] last name (lastName) [string]
+- [ ] email address (email) [string]
+- [ ] user type - admin or donor (type) [string]
 
 **SCHOOL RESOURCES**
-- [ ] school name (schoolName)
-- [ ] address (schoolAddress)
-- [ ] amount of funds requested (fundsRequested)
-- [ ] amount of funds received (fundsReceived)
+- [ ] school name (schoolName) [string]
+- [ ] address (schoolAddress) [string]
+- [ ] amount of funds requested (fundsRequested) [integer]
+- [ ] amount of funds received (fundsReceived) [integer]
 
