@@ -2,8 +2,10 @@
 function cloneAll {
   # Declare string variables we'll be reusing here
   $all = [ordered]@{
+    # Declare Common string
+    M     = "Luncher";
     # Declare the repos
-    repos = @{
+    repos = [ordered]@{
       # Org github Page
       GP  = "lambdaluncher.github.io"; 
       # UI project
@@ -17,43 +19,70 @@ function cloneAll {
       # Planning
       PG  = "luncher_planning"
     };
-    vars  = @{
-      M = "Luncher";
-      
+    Paths = @{
+      L  = "..\Luncher";
+      LR = "..\Luncher\*"
     };
     msgs  = @{
       dir     = "This isn't the project directory. Check your location!";
       present = "All the repos are here, I'll just pull everything.";
-      done    = "All done, check what changed!"
+      done    = "All done, check what changed!";
     }
   }
-  function Pull {
-    Get-ChildItem -recurse -filter ".git" -hidden | ForEach-Object {split-path $_.fullname} | % {pushd $_; git pull; popd}
-  }
-  function Clone {
-    git clone "https://github.com/fireinjun/LuncherSecrets.git"
-    $repos.ForEach( {git clone "https://github.com/lambdaluncher/$_.git"})
-  }
+  # git pull all repos in hashtable above
+  function pull { Get-ChildItem -recurse -filter ".git" -hidden | ForEach-Object {split-path $_.fullname} | ForEach-Object {Push-Location $_; git pull; Pop-Location}}
+  # git clone all repos in hashtable above
+  function clone { $all.repos.ForEach( {git clone "https://github.com/$_.git"}); git clone 'https://github.com/fireinjun/LuncherSecrets.git'}
   # Make Project directory if you haven't already to hold all repos for project
-  function Maker {
-    mkdir $all.vars.M; Push-Location $all.vars.M
-  }
-  
-  function CheckDir {
-    function get {Convert-Path .}
-    function BackOne {set-location (Convert-Path . | split-path  -Parent)};
-    
-  }
-  if (Test-Path -Path "..\Luncher") {
-    if ("..\Luncher\*" | Resolve-Path -Relative -eq % {".\$all.repos.($_)"}) {
-      Write-Output $all.msgs.present; Pull; Write-Output $all.msgs.done
+  function mkmain { mkdir $all.M; Push-Location $all.M}
+
+  # Main function 
+  function main {
+    # Check if current location is "Luncher"
+    # If we are in Luncher, check for children
+    if (Test-Path -Path $all.Paths.L) {
+      # If there are children
+      if (Test-Path -Path $all.Paths.LR) { 
+        # Hardcode initial array of directory names
+        $initial = @(
+          "Deployment",
+          "lambdaluncher.github.io",
+          "LuncherSecrets",
+          "luncher_back_end",
+          "luncher_front_end",
+          "luncher_planning",
+          "luncher_ui",
+          "nginx",
+          "assets"  
+        );
+        # deep copy initial array for 
+        $present = $initial | ForEach-Object { $_ }
+        # Declare empty array of the repos missing from the system.
+        $missing = @();
+        # Get the children directories of the project folder
+        function childDir {
+          $all.Paths.LR |
+            # Resolve the relative paths for easy manipulation
+          Resolve-Path -Relative | 
+            # Add the list of folders that are present to the present array
+          ForEach-Object {$present += ($_).trimstart('.\')}
+        }
+        # Populate the missing array with any unique repo names
+        function popMissing {
+          $missing += $present | Sort-Object -Unique
+        }
+        childDir
+        popMissing
+        Write-Output $all.msgs.present; pull; Write-Output $all.msgs.done
+      }
+      else {
+        clone; 
+      }
     }
     else {
-      Clone
-    }
+      mkmain; clone
+    };
   }
-  if ( Resolve-Path . -Relative -eq % {"..\$all.repos.($_)"}) {
-    Test-Path -Path "../Luncher"
-  }
-
+  main
 }
+cloneAll
